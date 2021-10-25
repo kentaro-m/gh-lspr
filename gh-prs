@@ -33,6 +33,7 @@ EXAMPLES
   $ gh prs
   $ gh prs -r
   $ gh prs -c
+  $ gh prs -m
 EOF
 }
 
