@@ -9,24 +9,6 @@ template='
 
 limit=10
 
-query='
-  query ($q: String!, $limit: Int = 10) {
-    search(first: $limit, type: ISSUE, query: $q) {
-      nodes {
-        ... on PullRequest {
-          number
-          title
-          url
-          updatedAt
-          repository {
-            name
-          }
-        }
-      }
-    }
-  }
-  '
-
 help() {
   cat <<-EOF
   Show pull requests list
@@ -48,44 +30,51 @@ EXAMPLES
 EOF
 }
 
-show_created_prs() {
-  local search='is:open is:pr author:@me'
-  gh api graphql -F q="$search" -F limit="$limit" -f query="$query" --template="$template"
-}
+show_filtered_prs() {
+  local query='
+  query ($q: String!, $limit: Int = 10) {
+    search(first: $limit, type: ISSUE, query: $q) {
+      nodes {
+        ... on PullRequest {
+          number
+          title
+          url
+          updatedAt
+          repository {
+            name
+          }
+        }
+      }
+    }
+  }
+  '
 
-show_review_requested_prs() {
-  local search='is:open is:pr review-requested:@me'
-  gh api graphql -F q="$search" -F limit="$limit" -f query="$query" --template="$template"
-}
-
-show_mentioned_prs() {
-  local search='is:open is:pr mentions:@me'
-  gh api graphql -F q="$search" -F limit="$limit" -f query="$query" --template="$template"
+  gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"
 }
 
 show_prs() {
   echo 'Review requested pull requests:'
-  show_review_requested_prs
+  show_filtered_prs 'is:open is:pr review-requested:@me'
   echo ''
   echo 'Created pull requests:'
-  show_created_prs
+  show_filtered_prs 'is:open is:pr author:@me'
   echo ''
   echo 'Mentioned pull requests:'
-  show_mentioned_prs
+  show_filtered_prs 'is:open is:pr mentions:@me'
 }
 
 while [ $# -gt 0 ]; do
   case "$1" in
   -r|--requested)
-    show_review_requested_prs
+    show_filtered_prs 'is:open is:pr review-requested:@me'
     exit 0
     ;;
   -c|--created)
-    show_created_prs
+    show_filtered_prs 'is:open is:pr author:@me'
     exit 0
     ;;
   -m|--mentioned)
-    show_mentioned_prs
+    show_filtered_prs 'is:open is:pr mentions:@me'
     exit 0
     ;;
   -h|--help)
