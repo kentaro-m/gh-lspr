@@ -9,7 +9,7 @@ template='
 
 limit=10
 
-help() {
+show_help() {
   cat <<-EOF
   Show pull requests list
 
@@ -78,7 +78,7 @@ while [ $# -gt 0 ]; do
     exit 0
     ;;
   -h|--help)
-    help
+    show_help
     exit 0
     ;;
   -l|--limit)
