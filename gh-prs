@@ -9,6 +9,12 @@ template='
 
 limit=10
 
+requested_prs_query='is:open is:pr review-requested:@me'
+
+created_prs_query='is:open is:pr author:@me'
+
+mentioned_prs_query='is:open is:pr mentions:@me'
+
 show_help() {
   cat <<-EOF
   Show pull requests list
@@ -31,7 +37,7 @@ EOF
 }
 
 show_filtered_prs() {
-  local query='
+  local q='
   query ($q: String!, $limit: Int = 10) {
     search(first: $limit, type: ISSUE, query: $q) {
       nodes {
@@ -49,32 +55,32 @@ show_filtered_prs() {
   }
   '
 
-  gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"
+  gh api graphql -F q="$1" -F limit="$limit" -f query="$q" --template="$template"
 }
 
 show_prs() {
   echo 'Review requested pull requests:'
-  show_filtered_prs 'is:open is:pr review-requested:@me'
+  show_filtered_prs "$requested_prs_query"
   echo ''
   echo 'Created pull requests:'
-  show_filtered_prs 'is:open is:pr author:@me'
+  show_filtered_prs "$created_prs_query"
   echo ''
   echo 'Mentioned pull requests:'
-  show_filtered_prs 'is:open is:pr mentions:@me'
+  show_filtered_prs "$mentioned_prs_query"
 }
 
 while [ $# -gt 0 ]; do
   case "$1" in
   -r|--requested)
-    show_filtered_prs 'is:open is:pr review-requested:@me'
+    show_filtered_prs "$requested_prs_query"
     exit 0
     ;;
   -c|--created)
-    show_filtered_prs 'is:open is:pr author:@me'
+    show_filtered_prs "$created_prs_query"
     exit 0
     ;;
   -m|--mentioned)
-    show_filtered_prs 'is:open is:pr mentions:@me'
+    show_filtered_prs "$mentioned_prs_query"
     exit 0
     ;;
   -h|--help)
