@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e
 
-template='
-{{- range $pr := .data.search.nodes -}}
-  {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
-{{- end -}}
-'
-
 limit=10
 
 requested_prs_query='is:open is:pr review-requested:@me'
@@ -56,6 +50,12 @@ show_filtered_prs() {
   }
   '
 
+  local template='
+{{- range $pr := .data.search.nodes -}}
+  {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
+{{- end -}}
+'
+
   gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"
 }
 
@@ -92,7 +92,7 @@ show_prs() {
   }
   '
 
-  local prs_template='
+  local template='
 {{- printf "Review requested pull requests:\n\n" | autocolor "magenta+b" -}}
 
 {{- range $pr := .data.requestedPR.nodes -}}
@@ -120,7 +120,7 @@ show_prs() {
     -F mentionedPRQuery="$mentioned_prs_query" \
     -F limit="$limit" \
     -f query="$query" \
-    --template="$prs_template"
+    --template="$template"
 }
 
 while [ $# -gt 0 ]; do
