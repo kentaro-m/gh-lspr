@@ -38,7 +38,7 @@ EOF
 }
 
 show_filtered_prs() {
-  local q='
+  local query='
   query ($q: String!, $limit: Int = 10) {
     search(first: $limit, type: ISSUE, query: $q) {
       nodes {
@@ -56,18 +56,71 @@ show_filtered_prs() {
   }
   '
 
-  gh api graphql -F q="$1" -F limit="$limit" -f query="$q" --template="$template"
+  gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"
 }
 
 show_prs() {
-  echo 'Review requested pull requests:'
-  show_filtered_prs "$requested_prs_query"
-  echo ''
-  echo 'Created pull requests:'
-  show_filtered_prs "$created_prs_query"
-  echo ''
-  echo 'Mentioned pull requests:'
-  show_filtered_prs "$mentioned_prs_query"
+  local query='
+  fragment pr on PullRequest {
+    ... on PullRequest {
+      number
+      title
+      url
+      updatedAt
+      repository {
+        name
+      }
+    }
+  }
+
+  query ($createdPRQuery: String!, $requestedPRQuery: String!, $mentionedPRQuery: String!, $limit: Int = 10) {
+    createdPR: search(first: $limit, type: ISSUE, query: $createdPRQuery) {
+      nodes {
+        ...pr
+      }
+    }
+    requestedPR: search(first: $limit, type: ISSUE, query: $requestedPRQuery) {
+      nodes {
+        ...pr
+      }
+    }
+    mentionedPR: search(first: $limit, type: ISSUE, query: $mentionedPRQuery) {
+      nodes {
+        ...pr
+      }
+    }
+  }
+  '
+
+  local prs_template='
+{{- printf "Review requested pull requests:\n\n" | autocolor "magenta+b" -}}
+
+{{- range $pr := .data.requestedPR.nodes -}}
+  {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
+{{- end -}}
+{{tablerender}}
+
+{{- printf "\nCreated pull requests:\n\n" | autocolor "magenta+b" -}}
+
+{{- range $pr := .data.createdPR.nodes -}}
+  {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
+{{- end -}}
+{{tablerender}}
+
+{{- printf "\nMentioned pull requests:\n\n" | autocolor "magenta+b" -}}
+
+{{- range $pr := .data.mentionedPR.nodes -}}
+  {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
+{{- end -}}
+{{tablerender}}
+'
+
+  gh api graphql -F createdPRQuery="$created_prs_query" \
+    -F requestedPRQuery="$requested_prs_query" \
+    -F mentionedPRQuery="$mentioned_prs_query" \
+    -F limit="$limit" \
+    -f query="$query" \
+    --template="$prs_template"
 }
 
 while [ $# -gt 0 ]; do
