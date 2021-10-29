@@ -95,23 +95,23 @@ show_prs() {
   '
 
   local template='
-{{- printf "Review requested pull requests:\n\n" | autocolor "magenta+b" -}}
+{{- printf "📂 Review requested pull requests\n\n" | autocolor "magenta+b" -}}
 
 {{- range $pr := .data.requestedPR.nodes -}}
   {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
 {{- end -}}
 {{tablerender}}
 
-{{- printf "\nCreated pull requests:\n\n" | autocolor "magenta+b" -}}
+{{- printf "\n✋ Mentioned pull requests\n\n" | autocolor "magenta+b" -}}
 
-{{- range $pr := .data.createdPR.nodes -}}
+{{- range $pr := .data.mentionedPR.nodes -}}
   {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
 {{- end -}}
 {{tablerender}}
 
-{{- printf "\nMentioned pull requests:\n\n" | autocolor "magenta+b" -}}
+{{- printf "\n👀 Created pull requests\n\n" | autocolor "magenta+b" -}}
 
-{{- range $pr := .data.mentionedPR.nodes -}}
+{{- range $pr := .data.createdPR.nodes -}}
   {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
 {{- end -}}
 {{tablerender}}
