@@ -3,6 +3,8 @@ set -e
 
 limit=10
 
+filtered_prs_query=''
+
 requested_prs_query='is:open is:pr review-requested:@me'
 
 created_prs_query='is:open is:pr author:@me'
@@ -126,16 +128,13 @@ show_prs() {
 while [ $# -gt 0 ]; do
   case "$1" in
   -r|--requested)
-    show_filtered_prs "$requested_prs_query"
-    exit 0
+    filtered_prs_query="$requested_prs_query"
     ;;
   -c|--created)
-    show_filtered_prs "$created_prs_query"
-    exit 0
+    filtered_prs_query="$created_prs_query"
     ;;
   -m|--mentioned)
-    show_filtered_prs "$mentioned_prs_query"
-    exit 0
+    filtered_prs_query="$mentioned_prs_query"
     ;;
   -h|--help)
     show_help
@@ -147,5 +146,10 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+
+if [ -n "$filtered_prs_query" ] ; then
+  show_filtered_prs "$filtered_prs_query"
+  exit 0
+fi
 
 show_prs
