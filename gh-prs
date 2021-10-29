@@ -79,6 +79,7 @@ show_filtered_prs() {
           updatedAt
           repository {
             name
+            nameWithOwner
           }
         }
       }
@@ -87,18 +88,26 @@ show_filtered_prs() {
   '
 
   local template='
-{{- range $pr := .data.search.nodes -}}
-  {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
-{{- end -}}
+{{ range $pr := .data.search.nodes }}
+{{ tablerow (printf "#%v" .number | autocolor "green") (.repository.nameWithOwner) (truncate 40 .title) (.updatedAt | timeago | autocolor "white")  }}
+{{ end }}
 
 {{ if eq (len .data.search.nodes) 0 }}
 {{- printf "No pull requests match your filter" -}}
 {{ else }}
-{{- tablerender -}}
+{{ tablerender }}
 {{ end }}
 '
 
-  gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"
+# local template='{{- if eq (len .data.search.nodes) 0 -}}
+# {{- printf "No pull requests match your filter" -}}
+# {{- else -}}
+# {{- range $pr := .data.search.nodes -}}
+# {{- printf "#%v\t%s\t%s\t%s\n" .number (.title | truncate 40) .url (.updatedAt | timeago) -}}
+# {{- end -}}
+# {{- end -}}'
+
+  gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"  | column -t -s$'\t'
 }
 
 show_prs() {
@@ -181,15 +190,21 @@ show_prs() {
 }
 
 search_pr() {
-  result="$(show_search_prs "$filtered_prs_query")"
+  local result=$(show_filtered_prs "$filtered_prs_query")
+  # echo 'hoge'
+  # echo -e $result
+  # echo 'fuga'
   fzf --ansi <<< "$result"
 }
 
 open_browser() {
-  local number repo_with_owner
-  IFS="$(echo -e '\t')" read number _ repo_with_owner _
-  echo "${number#*#}"
-  gh browse "${number#*#}" --repo "$repo_with_owner"
+  local a url b c
+  IFS="$(echo -e '\s\s')" read a b url c
+  echo $a
+  echo $b
+  echo $url
+  echo $c
+  # gh browse "${number#*#}" --repo "$repo_with_owner"
 }
 
 while [ $# -gt 0 ]; do
