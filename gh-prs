@@ -3,6 +3,8 @@ set -e
 
 limit=10
 
+is_interactive=0
+
 filtered_prs_query=''
 
 requested_prs_query='is:open is:pr review-requested:@me'
@@ -31,6 +33,38 @@ EXAMPLES
   $ gh prs -c
   $ gh prs -m
 EOF
+}
+
+show_search_prs() {
+  local query='
+  query ($q: String!, $limit: Int = 10) {
+    search(first: $limit, type: ISSUE, query: $q) {
+      nodes {
+        ... on PullRequest {
+          number
+          title
+          url
+          updatedAt
+          repository {
+            nameWithOwner
+          }
+        }
+      }
+    }
+  }
+  '
+
+  local template='
+{{- range $pr := .data.search.nodes -}}
+  {{- printf "#%v\t%s\t%s\t%s\n" .number .title .repository.nameWithOwner .updatedAt -}}
+{{- end -}}
+
+{{ if eq (len .data.search.nodes) 0 }}
+{{- printf "No pull requests match your filter" -}}
+{{ end }}
+'
+
+  gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"
 }
 
 show_filtered_prs() {
@@ -146,6 +180,18 @@ show_prs() {
     --template="$template"
 }
 
+search_pr() {
+  result="$(show_search_prs "$filtered_prs_query")"
+  fzf --ansi <<< "$result"
+}
+
+open_browser() {
+  local number repo_with_owner
+  IFS="$(echo -e '\t')" read number _ repo_with_owner _
+  echo "${number#*#}"
+  gh browse "${number#*#}" --repo "$repo_with_owner"
+}
+
 while [ $# -gt 0 ]; do
   case "$1" in
   -r|--requested)
@@ -156,6 +202,9 @@ while [ $# -gt 0 ]; do
     ;;
   -m|--mentioned)
     filtered_prs_query="$mentioned_prs_query"
+    ;;
+  -i|--interactive)
+    is_interactive=1
     ;;
   -h|--help)
     show_help
@@ -169,6 +218,11 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -n "$filtered_prs_query" ] ; then
+  if [ $is_interactive -eq 1 ] ; then
+     search_pr | open_browser
+     exit 0
+  fi
+
   show_filtered_prs "$filtered_prs_query"
   exit 0
 fi
