@@ -56,6 +56,12 @@ show_filtered_prs() {
 {{- range $pr := .data.search.nodes -}}
   {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
 {{- end -}}
+
+{{ if eq (len .data.search.nodes) 0 }}
+{{- printf "No pull requests match your filter" -}}
+{{ else }}
+{{- tablerender -}}
+{{ end }}
 '
 
   gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"
@@ -95,26 +101,41 @@ show_prs() {
   '
 
   local template='
-{{- printf "📂 Review requested pull requests\n\n" | autocolor "magenta+b" -}}
+{{- printf "👀 Review requested pull requests\n\n" | autocolor "magenta+b" -}}
 
 {{- range $pr := .data.requestedPR.nodes -}}
   {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
 {{- end -}}
-{{tablerender}}
+
+{{ if eq (len .data.requestedPR.nodes) 0 }}
+{{- printf "No review requested pull requests\n" -}}
+{{ else }}
+{{- tablerender -}}
+{{ end }}
 
 {{- printf "\n✋ Mentioned pull requests\n\n" | autocolor "magenta+b" -}}
 
 {{- range $pr := .data.mentionedPR.nodes -}}
   {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
 {{- end -}}
-{{tablerender}}
 
-{{- printf "\n👀 Created pull requests\n\n" | autocolor "magenta+b" -}}
+{{ if eq (len .data.mentionedPR.nodes) 0 }}
+{{- printf "No mentioned pull requests\n" -}}
+{{ else }}
+{{- tablerender -}}
+{{ end }}
+
+{{- printf "\n📂 Created pull requests\n\n" | autocolor "magenta+b" -}}
 
 {{- range $pr := .data.createdPR.nodes -}}
   {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
 {{- end -}}
-{{tablerender}}
+
+{{ if eq (len .data.createdPR.nodes) 0 }}
+{{- printf "No created pull requests\n" -}}
+{{ else }}
+{{- tablerender -}}
+{{ end }}
 '
 
   gh api graphql -F createdPRQuery="$created_prs_query" \
