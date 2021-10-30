@@ -12,6 +12,8 @@
   - Show pull request list which filter by mentioned to others
 
 ### Options
+- `-o`, `--org`
+  - Filter by organization name or user name
 - `-l`, `--limit`
   - Maximum number of items to fetch (default 10)
 - `-h`, `--help`

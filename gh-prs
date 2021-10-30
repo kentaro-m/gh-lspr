@@ -24,6 +24,7 @@ FLAGS
   -r, --review-requested    Filter by review requested to others
   -c, --created             Filter by created by myself 
   -m, --mentioned           Filter by mentioned to me
+  -o, --org                 Filter by organization name or user name
   -l, --limit               Maximum number of items to fetch (default 10)
   -h, --help                Show help
 
