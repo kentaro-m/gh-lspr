@@ -18,7 +18,7 @@ show_help() {
 This extension helps you to check pull requests which you need to respond.
 
 USAGE
-  $ gh prs [flags]
+  $ gh lspr [flags]
 
 FLAGS
   -r, --review-requested    Filter by review requested to others
@@ -29,11 +29,11 @@ FLAGS
   -h, --help                Show help
 
 EXAMPLES
-  $ gh prs
-  $ gh prs -l 20
-  $ gh prs -r
-  $ gh prs -c
-  $ gh prs -m -l 15
+  $ gh lspr
+  $ gh lspr -l 20
+  $ gh lspr -r
+  $ gh lspr -c
+  $ gh lspr -m -l 15
 EOF
 }
 
