@@ -70,7 +70,7 @@ show_filtered_pr_list() {
   gh api graphql -F q="$1" -F limit="$limit" -f query="$query" --template="$template"
 }
 
-show_prs() {
+show_multiple_pr_lists() {
   local query='
   fragment pr on PullRequest {
     ... on PullRequest {
@@ -185,8 +185,8 @@ if [ -n "$filtered_prs_query" ] ; then
 fi
 
 if [ -n "$org" ] ; then
-  show_prs "$created_prs_query org:$org" "$requested_prs_query org:$org" "$mentioned_prs_query org:$org"
+  show_multiple_pr_lists "$created_prs_query org:$org" "$requested_prs_query org:$org" "$mentioned_prs_query org:$org"
   exit 0
 fi
 
-show_prs "$created_prs_query" "$requested_prs_query" "$mentioned_prs_query"
+show_multiple_pr_lists "$created_prs_query" "$requested_prs_query" "$mentioned_prs_query"
