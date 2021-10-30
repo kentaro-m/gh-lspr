@@ -36,7 +36,7 @@ EXAMPLES
 EOF
 }
 
-show_filtered_prs() {
+show_filtered_pr_list() {
   local query='
   query ($q: String!, $limit: Int = 10) {
     search(first: $limit, type: ISSUE, query: $q) {
@@ -176,11 +176,11 @@ done
 
 if [ -n "$filtered_prs_query" ] ; then
   if [ -n "$org" ] ; then
-    show_filtered_prs "$filtered_prs_query org:$org"
+    show_filtered_pr_list "$filtered_prs_query org:$org"
     exit 0
   fi
 
-  show_filtered_prs "$filtered_prs_query"
+  show_filtered_pr_list "$filtered_prs_query"
   exit 0
 fi
 
