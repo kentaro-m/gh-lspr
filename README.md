@@ -3,6 +3,13 @@
 
 ![Show pull request list](./demo.gif)
 
+## Installation
+You need to install [GitHub CLI](https://github.com/cli/cli#installation) before you can use this extension.
+
+```shell
+$ gh extension install kentaro-m/gh-lspr
+```
+
 ## Usage
 - `gh lspr`
   - Show pull request list (filter by review requested, created and mentioned)
@@ -20,13 +27,6 @@
   - Maximum number of items to fetch (default 10)
 - `-h`, `--help`
   - Show help
-
-## Installation
-You need to install [GitHub CLI](https://github.com/cli/cli#installation) before you can use this extension.
-
-```shell
-$ gh extension install kentaro-m/gh-lspr
-```
 
 ## Licence
 MIT
