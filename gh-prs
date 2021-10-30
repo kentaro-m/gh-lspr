@@ -13,23 +13,24 @@ mentioned_prs_query='is:open is:pr mentions:@me'
 
 show_help() {
   cat <<-EOF
-  Show pull requests list
+This extension helps you to check pull requests which you need to respond.
 
 USAGE
   $ gh prs [flags]
 
 FLAGS
-  -r, --requested   Filter by review requested to others
-  -c, --created     Filter by created to me 
-  -m, --mentioned   Filter by mentioned to me
-  -l, --limit       Maximum number of items to fetch (default 10)
-  -h, --help        Show help
+  -r, --review-requested    Filter by review requested to others
+  -c, --created             Filter by created by myself 
+  -m, --mentioned           Filter by mentioned to me
+  -l, --limit               Maximum number of items to fetch (default 10)
+  -h, --help                Show help
 
 EXAMPLES
   $ gh prs
+  $ gh prs -l 20
   $ gh prs -r
   $ gh prs -c
-  $ gh prs -m
+  $ gh prs -m -l 15
 EOF
 }
 
