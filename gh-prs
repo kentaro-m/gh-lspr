@@ -11,6 +11,8 @@ created_prs_query='is:open is:pr author:@me'
 
 mentioned_prs_query='is:open is:pr mentions:@me'
 
+org=''
+
 show_help() {
   cat <<-EOF
 This extension helps you to check pull requests which you need to respond.
@@ -139,9 +141,9 @@ show_prs() {
 {{ end }}
 '
 
-  gh api graphql -F createdPRQuery="$created_prs_query" \
-    -F requestedPRQuery="$requested_prs_query" \
-    -F mentionedPRQuery="$mentioned_prs_query" \
+  gh api graphql -F createdPRQuery="$1" \
+    -F requestedPRQuery="$2" \
+    -F mentionedPRQuery="$3" \
     -F limit="$limit" \
     -f query="$query" \
     --template="$template"
@@ -165,13 +167,26 @@ while [ $# -gt 0 ]; do
   -l|--limit)
     limit=$2
     ;;
+  -o|--org)
+    org=$2
+    ;;
   esac
   shift
 done
 
 if [ -n "$filtered_prs_query" ] ; then
+  if [ -n "$org" ] ; then
+    show_filtered_prs "$filtered_prs_query org:$org"
+    exit 0
+  fi
+
   show_filtered_prs "$filtered_prs_query"
   exit 0
 fi
 
-show_prs
+if [ -n "$org" ] ; then
+  show_prs "$created_prs_query org:$org" "$requested_prs_query org:$org" "$mentioned_prs_query org:$org"
+  exit 0
+fi
+
+show_prs "$created_prs_query" "$requested_prs_query" "$mentioned_prs_query"
