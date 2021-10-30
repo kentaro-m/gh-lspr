@@ -149,6 +149,25 @@ show_multiple_pr_lists() {
     --template="$template"
 }
 
+handle_filter_flag() {
+  if [ -n "$filtered_prs_query" ] ; then
+    if [ -n "$org" ] ; then
+      show_filtered_pr_list "$filtered_prs_query org:$org"
+      exit 0
+    fi
+
+    show_filtered_pr_list "$filtered_prs_query"
+    exit 0
+  fi
+}
+
+handle_org_flag() {
+  if [ -n "$org" ] ; then
+    show_multiple_pr_lists "$created_prs_query org:$org" "$requested_prs_query org:$org" "$mentioned_prs_query org:$org"
+    exit 0
+  fi
+}
+
 while [ $# -gt 0 ]; do
   case "$1" in
   -r|--review-requested)
@@ -174,19 +193,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-if [ -n "$filtered_prs_query" ] ; then
-  if [ -n "$org" ] ; then
-    show_filtered_pr_list "$filtered_prs_query org:$org"
-    exit 0
-  fi
-
-  show_filtered_pr_list "$filtered_prs_query"
-  exit 0
-fi
-
-if [ -n "$org" ] ; then
-  show_multiple_pr_lists "$created_prs_query org:$org" "$requested_prs_query org:$org" "$mentioned_prs_query org:$org"
-  exit 0
-fi
+handle_filter_flag
+handle_org_flag
 
 show_multiple_pr_lists "$created_prs_query" "$requested_prs_query" "$mentioned_prs_query"
