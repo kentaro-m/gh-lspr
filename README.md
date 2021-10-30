@@ -1,14 +1,14 @@
-# gh prs
-`gh prs` is GitHub CLI extension. It helps you to check pull requests which you need to respond.
+# gh-lspr
+`gh lspr` is GitHub CLI extension. It helps you to check pull requests which you need to respond.
 
 ## Usage
-- `gh prs`
+- `gh lspr`
   - Show pull request list (filter by review requested, created and mentioned)
-- `gh prs --review-requested` ( `gh prs -r` )
+- `gh lspr --review-requested` ( `gh lspr -r` )
   - Show pull request list which filter by review requested to others
-- `gh prs --created` ( `gh prs -c` )
+- `gh lspr --created` ( `gh lspr -c` )
   - Show pull request list which filter by created by myself
-- `gh prs --mentioned` ( `gh prs -m` )
+- `gh lspr --mentioned` ( `gh lspr -m` )
   - Show pull request list which filter by mentioned to others
 
 ### Options
@@ -23,7 +23,7 @@
 You need to install [GitHub CLI](https://github.com/cli/cli#installation) before you can use this extension.
 
 ```shell
-$ gh extension install kentaro-m/gh-prs
+$ gh extension install kentaro-m/gh-lspr
 ```
 
 ## Licence
