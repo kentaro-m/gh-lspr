@@ -1,6 +1,8 @@
 # gh-lspr
 `gh lspr` is GitHub CLI extension. It helps you to check pull requests which you need to respond.
 
+![Show pull request list](./demo.gif)
+
 ## Usage
 - `gh lspr`
   - Show pull request list (filter by review requested, created and mentioned)
