@@ -23,7 +23,8 @@ USAGE
   $ gh lspr [flags]
 
 FLAGS
-  -r, --review-requested    Filter by review requested to others
+  -rr, --review-requested   Filter by review requested to others
+  -r, --reviewed            Filter by reviewed by me
   -c, --created             Filter by created by myself 
   -m, --mentioned           Filter by mentioned to me
   -o, --org                 Filter by organization name or user name
