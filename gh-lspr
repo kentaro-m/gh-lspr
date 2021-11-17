@@ -171,7 +171,7 @@ handle_org_flag() {
 
 while [ $# -gt 0 ]; do
   case "$1" in
-  -r|--review-requested)
+  -rr|--review-requested)
     filtered_prs_query="$requested_prs_query"
     ;;
   -c|--created)
