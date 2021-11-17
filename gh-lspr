@@ -185,7 +185,7 @@ handle_filter_flag() {
 
 handle_org_flag() {
   if [ -n "$org" ] ; then
-    show_multiple_pr_lists "$created_prs_query org:$org" "$requested_prs_query org:$org" "$mentioned_prs_query org:$org"
+    show_multiple_pr_lists "$created_prs_query org:$org" "$requested_prs_query org:$org" "$mentioned_prs_query org:$org" "$reviewed_prs_query org:$org"
     exit 0
   fi
 }
