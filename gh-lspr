@@ -11,6 +11,8 @@ created_prs_query='is:open is:pr author:@me'
 
 mentioned_prs_query='is:open is:pr mentions:@me'
 
+reviewed_prs_query='is:open is:pr reviewed-by:@me'
+
 org=''
 
 show_help() {
@@ -85,7 +87,7 @@ show_multiple_pr_lists() {
     }
   }
 
-  query ($createdPRQuery: String!, $requestedPRQuery: String!, $mentionedPRQuery: String!, $limit: Int = 10) {
+  query ($createdPRQuery: String!, $requestedPRQuery: String!, $mentionedPRQuery: String!, $reviewedPRQuery: String!, $limit: Int = 10) {
     createdPR: search(first: $limit, type: ISSUE, query: $createdPRQuery) {
       nodes {
         ...pr
@@ -97,6 +99,11 @@ show_multiple_pr_lists() {
       }
     }
     mentionedPR: search(first: $limit, type: ISSUE, query: $mentionedPRQuery) {
+      nodes {
+        ...pr
+      }
+    }
+    reviewedPR: search(first: $limit, type: ISSUE, query: $reviewedPRQuery) {
       nodes {
         ...pr
       }
@@ -113,6 +120,18 @@ show_multiple_pr_lists() {
 
 {{ if eq (len .data.requestedPR.nodes) 0 }}
 {{- printf "No review requested pull requests\n" -}}
+{{ else }}
+{{- tablerender -}}
+{{ end }}
+
+{{- printf "\n📝 Reviewed pull requests\n\n" | autocolor "magenta+b" -}}
+
+{{- range $pr := .data.reviewedPR.nodes -}}
+  {{- tablerow (printf "#%v" .number | autocolor "green") (truncate 40 .title) (.url | autocolor "cyan") (.updatedAt | timeago | autocolor "white")  -}}
+{{- end -}}
+
+{{ if eq (len .data.reviewedPR.nodes) 0 }}
+{{- printf "No reviewed pull requests\n" -}}
 {{ else }}
 {{- tablerender -}}
 {{ end }}
@@ -145,6 +164,7 @@ show_multiple_pr_lists() {
   gh api graphql -F createdPRQuery="$1" \
     -F requestedPRQuery="$2" \
     -F mentionedPRQuery="$3" \
+    -F reviewedPRQuery="$4" \
     -F limit="$limit" \
     -f query="$query" \
     --template="$template"
@@ -180,6 +200,9 @@ while [ $# -gt 0 ]; do
   -m|--mentioned)
     filtered_prs_query="$mentioned_prs_query"
     ;;
+  -r)
+    filtered_prs_query="$reviewed_prs_query"
+    ;;
   -h|--help)
     show_help
     exit 0
@@ -197,4 +220,4 @@ done
 handle_filter_flag
 handle_org_flag
 
-show_multiple_pr_lists "$created_prs_query" "$requested_prs_query" "$mentioned_prs_query"
+show_multiple_pr_lists "$created_prs_query" "$requested_prs_query" "$mentioned_prs_query" "$reviewed_prs_query"
